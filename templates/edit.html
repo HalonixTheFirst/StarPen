@@ -1,0 +1,184 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Story - StarPen{% endblock %}
+
+{% block styles %}
+.edit-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    pointer-events: auto;
+}
+
+.page-header { margin-bottom: 2rem; text-align: center; }
+.page-header h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(to right, #fff, var(--magic-p1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.form-group label { font-weight: 600; color: #e2e8f0; }
+
+.form-group input[type="text"], .form-group textarea {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(15, 15, 35, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+}
+
+/* Upload & Remove Styling */
+.edit-upload-wrapper {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+#imgPreview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+#uploadPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #cbd5e0;
+    z-index: 1;
+}
+
+#removeBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(255, 59, 59, 0.8);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    backdrop-filter: blur(5px);
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.form-actions-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn { padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 700; cursor: pointer; border: none; text-decoration: none; }
+.btn-primary { background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1)); color: white; }
+.btn-secondary { background: rgba(255, 255, 255, 0.05); color: #cbd5e0; }
+.btn-danger { background: rgba(255, 50, 50, 0.15); color: #ff8080; border: 1px solid rgba(255, 50, 50, 0.2); }
+{% endblock %}
+
+{% block content %}
+<div class="edit-container">
+    <div class="page-header">
+        <h1>Refine Your Story</h1>
+    </div>
+
+    <form method="POST" action="/edit/{{ blog.id }}" id="editForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Thumbnail Image</label>
+            <div class="edit-upload-wrapper">
+                <button type="button" id="removeBtn" style="display: {% if blog.thumbnail %}block{% else %}none{% endif %};">
+                    Remove Image
+                </button>
+
+                <img id="imgPreview"
+                     src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) if blog.thumbnail else '' }}"
+                     style="display: {% if blog.thumbnail %}block{% else %}none{% endif %};">
+
+                <div id="uploadPlaceholder" style="display: {% if blog.thumbnail %}none{% else %}flex{% endif %};">
+                    <span style="font-size: 2.5rem;">📸</span>
+                    <p>Click to upload new image</p>
+                </div>
+
+                <input type="file" name="thumbnail" id="thumbnailInput" class="file-input" accept="image/*">
+
+                <input type="hidden" name="remove_image" id="removeImageFlag" value="false">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="{{ blog.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="content">The Story</label>
+            <textarea id="content" name="content" required>{{ blog.content }}</textarea>
+        </div>
+    </form>
+
+    <div class="form-actions-row">
+        <form method="POST" action="/delete/{{ blog.id }}" onsubmit="return confirm('Delete this story permanently?');">
+            <button type="submit" class="btn btn-danger">Delete Story</button>
+        </form>
+
+        <div style="display: flex; gap: 1rem;">
+            <a href="/my-blogs" class="btn btn-secondary">Cancel</a>
+            <button type="submit" form="editForm" class="btn btn-primary">Update Story</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('thumbnailInput');
+    const imgPreview = document.getElementById('imgPreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const removeBtn = document.getElementById('removeBtn');
+    const removeFlag = document.getElementById('removeImageFlag');
+
+    fileInput.onchange = evt => {
+        const [file] = fileInput.files;
+        if (file) {
+            imgPreview.src = URL.createObjectURL(file);
+            imgPreview.style.display = 'block';
+            placeholder.style.display = 'none';
+            removeBtn.style.display = 'block';
+            removeFlag.value = "false"; // We just added an image
+        }
+    };
+
+    removeBtn.onclick = () => {
+        fileInput.value = ""; // Clear file selector
+        imgPreview.src = "";
+        imgPreview.style.display = 'none';
+        placeholder.style.display = 'flex';
+        removeBtn.style.display = 'none';
+        removeFlag.value = "true"; // Signal Python to delete the file
+    };
+</script>
+{% endblock %}

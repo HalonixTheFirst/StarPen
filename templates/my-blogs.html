@@ -1,0 +1,170 @@
+{% extends "layout.html" %}
+
+{% block title %}My Blogs - BlogHub{% endblock %}
+
+{% block styles %}
+.page-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    color: #2d3748;
+}
+
+.btn-create {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.blog-item {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.blog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.blog-header h2 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.blog-content {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.blog-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.blog-date {
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.empty-state {
+    background: white;
+    padding: 4rem 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state h3 {
+    color: #4a5568;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.empty-state p {
+    color: #718096;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state a {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.empty-state a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Blogs</h1>
+    <a href="/create" class="btn-create">+ Write New Blog</a>
+</div>
+
+{% if blogs %}
+    <div class="blog-list">
+        {% for blog in blogs %}
+        <div class="blog-item">
+            <div class="blog-header">
+                <h2>{{ blog.title }}</h2>
+            </div>
+            <div class="blog-content">
+                {{ blog.content }}
+            </div>
+            <div class="blog-footer">
+                <span class="blog-date">Created on {{ blog.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                <a href="/edit/{{ blog.id }}" class="btn-edit">Edit</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>You haven't written any blogs yet</h3>
+        <p>Start sharing your thoughts and stories with the community!</p>
+        <a href="/create">Write Your First Blog</a>
+    </div>
+{% endif %}
+{% endblock %}

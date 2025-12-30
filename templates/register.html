@@ -1,0 +1,204 @@
+{% extends "layout.html" %}
+
+{% block title %}Register - StarPen{% endblock %}
+
+{% block styles %}
+.split-screen {
+    display: flex;
+    /* Aligns both the form and the preview to the top */
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4rem;
+    min-height: 90vh;
+    padding-top: 1rem; /* Adjusts how far down from the navbar the whole section starts */
+}
+
+/* Auth Card Styling */
+.auth-card {
+    background: rgba(255, 255, 255, 0.05);
+    width: 100%;
+    max-width: 420px;
+    padding: 3rem;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    pointer-events: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.auth-card h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    background: linear-gradient(to right, #fff, var(--magic-p1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: #cbd5e0; font-weight: 500; }
+
+.form-group input {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    background: rgba(15, 15, 35, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--magic-v1);
+    box-shadow: 0 0 15px rgba(140, 150, 255, 0.3);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(180, 120, 255, 0.3);
+}
+
+/* Preview Side Styling - Top Aligned */
+.app-preview {
+    width: 420px;
+    display: none;
+}
+
+@media (min-width: 992px) { .app-preview { display: block; } }
+
+.preview-header {
+    color: white;
+    opacity: 0.5;
+    margin-bottom: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-align: center;
+    font-size: 0.9rem;
+    /* This ensures the header is level with the form's title */
+    padding-top: 0.5rem;
+}
+
+.preview-stack {
+    position: relative;
+    /* Ensure the first card starts high up */
+    margin-top: 0;
+}
+
+.mock-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+    /* Spreads the cards out to occupy vertical space */
+    margin-bottom: -230px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mock-card:hover {
+    transform: scale(1.05) rotate(0deg) translateY(-20px) !important;
+    z-index: 100 !important;
+}
+
+.mock-thumb { height: 160px; width: 100%; }
+.mock-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.mock-content { padding: 1.5rem; color: #1a202c; }
+.mock-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #1a202c; font-weight: 800; }
+.mock-content p { font-size: 0.9rem; color: #4a5568; line-height: 1.5; }
+
+.auth-footer { text-align: center; margin-top: 1.5rem; color: #a0aec0; }
+.auth-footer a { color: var(--magic-v1); text-decoration: none; font-weight: 600; }
+
+.error-msg {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff9999;
+    padding: 0.8rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+}
+{% endblock %}
+
+{% block content %}
+<div class="split-screen">
+    <div class="app-preview">
+        <div class="preview-header">LATEST STORIES</div>
+
+        <div class="preview-stack">
+            {% if preview_blogs %}
+                {% for blog in preview_blogs %}
+                <div class="mock-card" style="transform: rotate({{ loop.index * -2.5 }}deg); z-index: {{ 10 - loop.index }};">
+                    <div class="mock-thumb">
+                        {% if blog.thumbnail %}
+                            <img src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) }}">
+                        {% else %}
+                            <div style="width:100%; height:100%; background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));"></div>
+                        {% endif %}
+                    </div>
+                    <div class="mock-content">
+                        <h3>{{ blog.title }}</h3>
+                        <p>{{ blog.content[:80] }}...</p>
+                        <div style="margin-top: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--magic-p1); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;">{{ blog.author.username[0]|upper }}</div>
+                            <span style="font-size: 0.8rem; font-weight: 600; color: #718096;">@{{ blog.author.username }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="mock-card">
+                    <div class="mock-thumb" style="background: #2d3748; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">🖋️</div>
+                    <div class="mock-content">
+                        <h3>Ready to write?</h3>
+                        <p>Join the community and share your thoughts today.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <h1>Join StarPen</h1>
+
+        {% if error %}
+            <div class="error-msg">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/register">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Pick a pen name" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Minimum 8 characters" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirmation" placeholder="Repeat your password" required>
+            </div>
+            <button type="submit" class="btn-submit">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already a member? <a href="/login">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

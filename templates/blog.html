@@ -1,0 +1,364 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ blog.title }} - StarPen{% endblock %}
+
+{% block styles %}
+.blog-view-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding-bottom: 5rem;
+    pointer-events: auto;
+}
+
+.blog-post-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    backdrop-filter: blur(15px);
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.blog-hero-img {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-placeholder-hero {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+}
+
+.blog-header { padding: 3rem 3rem 1.5rem 3rem; }
+
+.blog-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, #fff, #cbd5e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.blog-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #a0aec0;
+}
+
+.author-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 15px 5px 5px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 600;
+}
+
+.author-initial {
+    width: 30px;
+    height: 30px;
+    background: var(--magic-p1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.blog-body {
+    padding: 0 3rem 4rem 3rem;
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+/* --- Comments Styling --- */
+
+.comments-section {
+    margin-top: 3rem;
+    padding: 0 1rem;
+}
+
+.comments-section h3 {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.comment-form {
+    margin-bottom: 2.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-form textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    color: white;
+    resize: none;
+    font-family: inherit;
+    margin-bottom: 1rem;
+}
+
+.comment-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 18px;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comment-user {
+    color: var(--magic-p1);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.comment-date {
+    color: #718096;
+    font-size: 0.8rem;
+}
+
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.delete-comment-btn:hover { opacity: 1; text-decoration: underline; }
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--magic-p1);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+/* ===== Delete Comment Alert ===== */
+.alert-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.alert-box {
+    background: rgba(30, 30, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    animation: fadeIn 0.25s ease-out;
+}
+
+.alert-box h4 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+}
+
+.alert-box p {
+    color: #cbd5e0;
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+}
+
+.alert-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.alert-btn {
+    padding: 0.6rem 1.4rem;
+    border-radius: 30px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.alert-cancel {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.alert-delete {
+    background: linear-gradient(135deg, #ff5f5f, #ff3b3b);
+    color: white;
+}
+
+{% endblock %}
+
+{% block content %}
+<div class="blog-view-container">
+    <a href="/" class="back-btn">← Back to Feed</a>
+
+    <article class="blog-post-card">
+        {% if blog.thumbnail %}
+            <img src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) }}" class="blog-hero-img">
+        {% else %}
+            <div class="blog-placeholder-hero">✨</div>
+        {% endif %}
+
+        <div class="blog-header">
+            <h1 class="blog-title">{{ blog.title }}</h1>
+
+            <div class="blog-meta">
+                <div class="author-badge">
+                    <div class="author-initial">{{ blog.author.username[0]|upper }}</div>
+                    <span>@{{ blog.author.username }}</span>
+                </div>
+                <span>•</span>
+                <span>{{ blog.created_at.strftime("%B %d, %Y") }}</span>
+            </div>
+        </div>
+
+        <div class="blog-body">
+            {{ blog.content }}
+        </div>
+    </article>
+
+    <section class="comments-section">
+        <h3>Comments ({{ blog.comments|length }})</h3>
+
+        {% if session.get("user_id") %}
+            <form action="/blog/{{ blog.id }}/comment"
+                  method="POST"
+                  class="comment-form"
+                  onsubmit="event.preventDefault(); validateComment(this);">
+
+                <textarea
+                    id="commentInput"
+                    name="comment_content"
+                    rows="3"
+                    placeholder="Add a comment..."></textarea>
+
+                <button type="submit"
+                        style="padding: 0.7rem 1.5rem;
+                               border-radius: 30px;
+                               border:none;
+                               color:white;
+                               background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+                               cursor:pointer;">
+                    Post Comment
+                </button>
+            </form>
+
+        {% else %}
+        <div class="comment-form" style="text-align: center;">
+            <p style="color: #a0aec0;">Please <a href="/login" style="color: var(--magic-p1);">login</a> to join the conversation.</p>
+        </div>
+        {% endif %}
+
+        <div class="comments-list">
+            {% for comment in blog.comments|sort(attribute='created_at', reverse=True) %}
+            <div class="comment-card">
+                <div class="comment-header">
+                    <div>
+                        <span class="comment-user">@{{ comment.user.username }}</span>
+                        <span class="comment-date">• {{ comment.created_at.strftime("%b %d") }}</span>
+                    </div>
+
+                    {% if session.get("user_id") == comment.user_id %}
+                       <form action="/comment/delete/{{ comment.id }}" method="POST"
+                          onsubmit="event.preventDefault(); openDeleteAlert(this);">
+                            <button type="submit" class="delete-comment-btn">Delete</button>
+                        </form>
+
+                    {% endif %}
+                </div>
+                <p style="color: #cbd5e0; margin: 0;">{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+<div id="deleteAlert" class="alert-overlay" style="display:none;">
+    <div class="alert-box">
+        <h4>Delete comment?</h4>
+        <p>This action cannot be undone.</p>
+
+        <div class="alert-actions">
+            <button class="alert-btn alert-cancel" onclick="closeDeleteAlert()">Cancel</button>
+            <button class="alert-btn alert-delete" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+<script>
+let deleteForm = null;
+
+function openDeleteAlert(form) {
+    deleteForm = form;
+    document.getElementById("deleteAlert").style.display = "flex";
+}
+
+function closeDeleteAlert() {
+    deleteForm = null;
+    document.getElementById("deleteAlert").style.display = "none";
+}
+
+document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+    if (deleteForm) {
+        deleteForm.submit();
+    }
+});
+</script>
+<script>
+function validateComment(form) {
+    const input = document.getElementById("commentInput");
+
+    if (!input.value.trim()) {
+        document.getElementById("commentAlert").style.display = "flex";
+        return;
+    }
+
+    form.submit();
+}
+
+function closeCommentAlert() {
+    document.getElementById("commentAlert").style.display = "none";
+}
+</script>
+
+{% endblock %}
