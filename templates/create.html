@@ -188,7 +188,124 @@
 .error-message.visible {
     opacity: 1;
 }
+/* Container must be relative for the bear to anchor to it */
+.create-container {
+    position: relative;
+    margin-top: 5rem; /* Increased margin to give the bear room to sit */
+}
 
+.writer-buddy {
+    position: absolute;
+    top: -55px; /* Adjust this based on your GIF height */
+    left: 600px;
+    z-index: 200;
+    pointer-events: auto;
+}
+
+.writer-buddy img {
+    width: 80px; /* Adjust size as needed */
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(180, 120, 255, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.writer-buddy:hover img {
+    transform: scale(1.1) translateY(-5px);
+}
+
+/* Optional Speech Bubble */
+.buddy-bubble {
+    position: absolute;
+    top: -30px;
+    left: 50px;
+    background: white;
+    color: #1a1a2e;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.writer-buddy:hover .buddy-bubble {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* 1. This wrapper makes the bear stick to the textarea specifically */
+/* 1. Wrapper needs more space at the top so bear doesn't hit the 'Story' label */
+.textarea-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 45px;
+}
+
+/* 2. Positioned to the Top-Right */
+.writer-buddy {
+    position: absolute;
+    top: -50px;   /* Pulls him up onto the top border */
+    right: 15px;  /* Changed from left to right */
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.writer-buddy img {
+    width: 70px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(180, 120, 255, 0.4));
+    /* Flips the bear to face left (towards the text) */
+    transform: scaleX(-1);
+    animation: buddy-float 3s ease-in-out infinite;
+}
+
+/* 3. The Speech Bubble */
+.buddy-bubble {
+    background: white;
+    color: #1a1a2e;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    position: relative;
+}
+
+/* Adds a little tail to the bubble pointing to the bear */
+.buddy-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
+}
+
+/* 4. Textarea tweaks */
+#content {
+    width: 100%;
+    min-height: 250px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 15, 35, 0.7);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* Floating animation including the flip */
+@keyframes buddy-float {
+    0%, 100% { transform: translateY(0) scaleX(-1); }
+    50% { transform: translateY(-6px) scaleX(-1); }
+}
 {% endblock %}
 
 {% block content %}
@@ -198,7 +315,7 @@
         <p>Illuminate the world with your words.</p>
     </div>
 
-    <form method="POST" action="/create" class="blog-form" enctype="multipart/form-data">
+    <form method="POST" action="/create" id="blogform" class="blog-form" enctype="multipart/form-data">
 
         <div class="form-group">
             <label>Cover Thumbnail</label>
@@ -232,8 +349,17 @@
         </div>
         <div class="form-group">
             <label for="content">The Story</label>
-            <textarea id="content" name="content" placeholder="Share your magic..." required></textarea>
-            <div style="text-align: right; font-size: 0.8rem; color: #718096;" id="charCount">0 characters</div>
+
+            <div class="textarea-wrapper">
+                <div class="writer-buddy">
+                    <div class="buddy-bubble">Ready to write? ✨</div>
+                    <img src="https://tqyrlqtglwmnmulzyumo.supabase.co/storage/v1/object/public/thumbnails/transparent-cute.gif" alt="Writing Bear">
+                </div>
+
+                <textarea id="content" name="content" placeholder="Share your magic..." required></textarea>
+            </div>
+
+            <div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 5px;" id="charCount">0 characters</div>
         </div>
 
         <div class="form-actions">
@@ -276,7 +402,7 @@
     };
 </script>
 <script>
-const editForm = document.getElementById('editForm');
+const editForm = document.getElementById('blogform');
 const categorySelect = document.getElementById('category');
 const categoryError = document.getElementById('categoryError');
 
@@ -296,6 +422,17 @@ categorySelect.addEventListener('input', () => {
         categoryError.textContent = "";
         categoryError.classList.remove('visible');
     }
+});
+const storyTextarea = document.getElementById('content');
+const buddyBubble = document.querySelector('.buddy-bubble');
+
+storyTextarea.addEventListener('focus', () => {
+    buddyBubble.innerText = "You're doing great! ✍️";
+    buddyBubble.style.opacity = "1";
+});
+
+storyTextarea.addEventListener('blur', () => {
+    buddyBubble.style.opacity = "0";
 });
 </script>
 

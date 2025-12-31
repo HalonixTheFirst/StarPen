@@ -4,56 +4,71 @@
 
 {% block styles %}
 /* Search Section */
+/* Container & Bar Glow */
 .search-container {
-    max-width: 700px;
-    margin: 1rem auto 4rem auto;
-    pointer-events: auto;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    transition: all 0.4s ease;
 }
 
 .search-form {
-    position: relative;
     display: flex;
     align-items: center;
-    width: 100%;
-}
-
-.search-bar {
-    width: 100%;
-    padding: 1.2rem 4.5rem 1.2rem 1.8rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50px;
-    backdrop-filter: blur(15px);
-    color: white;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
 }
 
-.search-bar:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.1);
+/* Expansion and Border Glow on Focus */
+.search-form:focus-within {
+    background: rgba(255, 255, 255, 0.08);
     border-color: var(--magic-p1);
-    box-shadow: 0 0 25px rgba(180, 120, 255, 0.3);
+    box-shadow: 0 0 25px rgba(180, 120, 255, 0.2);
+    transform: translateY(-2px);
 }
 
-.search-submit-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+.search-bar {
+    flex-grow: 1;
+    background: transparent;
     border: none;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
     color: white;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+/* The Magnifying Glass Animation */
+.search-submit-btn {
+    background: transparent;
+    border: none;
     cursor: pointer;
+    font-size: 1.4rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    transition: all 0.2s ease;
+    transition: transform 0.3s ease;
+}
+
+.search-submit-btn span {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+/* When the user is typing or clicking in the box */
+.search-form:focus-within .search-submit-btn span {
+    transform: scale(1.2) rotate(-10deg);
+    filter: drop-shadow(0 0 8px var(--magic-p1));
+    animation: searchPulse 2s infinite ease-in-out;
+}
+
+/* Float & Glow Animation */
+@keyframes searchPulse {
+    0% { transform: scale(1.2) rotate(-10deg); filter: drop-shadow(0 0 5px var(--magic-p1)); }
+    50% { transform: scale(1.3) rotate(5deg); filter: drop-shadow(0 0 15px var(--magic-p1)); }
+    100% { transform: scale(1.2) rotate(-10deg); filter: drop-shadow(0 0 5px var(--magic-p1)); }
 }
 
 /* Blog Grid Layout */
@@ -227,7 +242,7 @@
     {% if search_query %}
     <div style="margin-top: 1.5rem; text-align: center; color: #a0aec0;">
         Found results for <strong>"{{ search_query }}"</strong>
-        <a href="/" style="color: var(--magic-p1); margin-left: 10px; text-decoration: none;">Clear filter</a>
+        <a href="/" style="color: var(--magic-p1); margin-left: 10px; text-decoration: none; font-weight: bold;">✕ Clear filter</a>
     </div>
     {% endif %}
 </div>
@@ -237,7 +252,7 @@
     <a href="/blog/{{ blog.id }}" class="blog-card">
         <div class="card-thumb">
             {% if blog.thumbnail %}
-            <img src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) }}" alt="Thumbnail">
+            <img src="{{blog.thumbnail}}" alt="Thumbnail">
             {% else %}
             <div style="width:100%; height:100%; background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1)); display:flex; align-items:center; justify-content:center; font-size:3rem;">✨</div>
             {% endif %}

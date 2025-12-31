@@ -14,7 +14,12 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,   # Checks if the connection is alive before every query
+    "pool_recycle": 280,     # Closes and re-opens the connection every ~4 minutes
+    "pool_size": 10,         # Maximum number of connections to keep open
+    "max_overflow": 20,      # Allow extra connections during high traffic
+}
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)

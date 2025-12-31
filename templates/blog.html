@@ -245,11 +245,12 @@
     <a href="/" class="back-btn">← Back to Feed</a>
 
     <article class="blog-post-card">
-        {% if blog.thumbnail %}
-            <img src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) }}" class="blog-hero-img">
-        {% else %}
-            <div class="blog-placeholder-hero">✨</div>
-        {% endif %}
+        <article class="blog-post-card">
+            {% if blog.thumbnail %}
+                <img src="{{ blog.thumbnail }}" class="blog-hero-img">
+            {% else %}
+                <div class="blog-placeholder-hero">✨</div>
+            {% endif %}
 
         <div class="blog-header">
             <span class="category-pill">{{ blog.category.name }}</span>
@@ -324,6 +325,7 @@
             {% endfor %}
         </div>
     </section>
+    </article>
 </div>
 <div id="deleteAlert" class="alert-overlay" style="display:none;">
     <div class="alert-box">

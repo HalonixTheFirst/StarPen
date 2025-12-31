@@ -126,7 +126,132 @@ select option {
     background: rgba(15, 15, 35, 0.9);
     color: white;
 }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 25, 0.85); /* Darker backdrop */
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
 
+.modal-content {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3rem;
+    border-radius: 28px;
+    text-align: center;
+    max-width: 450px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.modal-overlay.active { display: flex; }
+
+.btn-confirm-delete {
+    background: linear-gradient(135deg, #ff4d4d, #f12711);
+    color: white;
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: #cbd5e0;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.btn-delete-aesthetic {
+    background: rgba(255, 77, 77, 0.05); /* Very subtle red tint */
+    color: #ff6b6b; /* Soft red text */
+    border: 1px solid rgba(255, 77, 77, 0.2);
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+    backdrop-filter: blur(5px);
+}
+
+.btn-delete-aesthetic:hover {
+    background: #ff4d4d; /* Solid red on hover */
+    color: white;
+    border-color: #ff4d4d;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-delete-aesthetic:active {
+    transform: translateY(0);
+}
+/* Update Story Button */
+.btn-update-aesthetic {
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(180, 120, 255, 0.2);
+}
+
+.btn-update-aesthetic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(180, 120, 255, 0.5);
+    filter: brightness(1.1);
+}
+
+/* Cancel Button */
+.btn-secondary-aesthetic {
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary-aesthetic:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.btn-cancel-aesthetic {
+    background: rgba(255, 255, 255, 0.05); /* Very light transparent white */
+    color: #a0aec0; /* Soft grey text */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+    display: inline-block;
+}
+
+.btn-cancel-aesthetic:hover {
+    background: rgba(255, 255, 255, 0.1); /* Brightens slightly */
+    color: #ffffff; /* Text turns white */
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-cancel-aesthetic:active {
+    transform: translateY(0);
+}
 {% endblock %}
 
 {% block content %}
@@ -144,7 +269,7 @@ select option {
                 </button>
 
                 <img id="imgPreview"
-                     src="{{ url_for('static', filename='uploads/thumbnails/' + blog.thumbnail) if blog.thumbnail else '' }}"
+                     src="{{blog.thumbnail if blog.thumbnail else '' }}"
                      style="display: {% if blog.thumbnail %}block{% else %}none{% endif %};">
 
                 <div id="uploadPlaceholder" style="display: {% if blog.thumbnail %}none{% else %}flex{% endif %};">
@@ -182,12 +307,14 @@ select option {
 
     <div class="form-actions-row">
         <form method="POST" action="/delete/{{ blog.id }}" onsubmit="return confirm('Delete this story permanently?');">
-            <button type="submit" class="btn btn-danger">Delete Story</button>
+            <button type="button" class="btn-delete-aesthetic" onclick="openDeleteModal('/delete/{{ blog.id }}')">
+            Delete Post
+        </button>
         </form>
 
         <div style="display: flex; gap: 1rem;">
-            <a href="/my-blogs" class="btn btn-secondary">Cancel</a>
-            <button type="submit" form="editForm" class="btn btn-primary">Update Story</button>
+            <a href="/my-blogs" class="btn-cancel-aesthetic">Cancel</a>
+            <button type="submit" form="editForm" class="btn-update-aesthetic">Update Story</button>
         </div>
     </div>
 </div>
@@ -218,5 +345,34 @@ select option {
         removeBtn.style.display = 'none';
         removeFlag.value = "true"; // Signal Python to delete the file
     };
+    function openDeleteModal(deleteUrl) {
+    const modal = document.getElementById('deleteModal');
+    const confirmLink = document.getElementById('confirmDeleteLink');
+    confirmLink.href = deleteUrl;
+    modal.classList.add('active');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+}
+
+// Close if user clicks outside the modal box
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target == modal) {
+        closeDeleteModal();
+    }
+}
 </script>
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-icon">🌠</div>
+        <h2>Delete this Story?</h2>
+        <p>Once you erase this star, it vanishes from the galaxy forever.</p>
+        <div class="modal-actions">
+            <button type="button" onclick="closeDeleteModal()" class="btn-cancel">Keep it</button>
+            <a id="confirmDeleteLink" href="#" class="btn-confirm-delete">Erase Permanently</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
