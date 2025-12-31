@@ -5,8 +5,8 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-
 from helper import login_required
+from supabase import create_client, Client
 
 load_dotenv()
 
@@ -15,9 +15,9 @@ app.secret_key = os.getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-UPLOAD_FOLDER = 'static/uploads/thumbnails'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 db = SQLAlchemy(app)
 
@@ -133,23 +133,32 @@ def create():
         file = request.files.get("thumbnail")
 
         if not title or not content or not category_id:
-            return render_template(
-                "create.html",
-                error="All fields are required",
-                categories=categories
-            )
+            return render_template("create.html", error="All fields are required", categories=categories)
 
-        filename = None
+        image_url = None
         if file and file.filename:
-            ext = file.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            try:
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                unique_name = f"{uuid.uuid4()}.{ext}"
+
+                # Upload binary data to Supabase Storage
+                file_data = file.read()
+                supabase.storage.from_("thumbnails").upload(
+                    path=unique_name,
+                    file=file_data,
+                    file_options={"content-type": f"image/{ext}"}
+                )
+
+                # Get the full public URL for the database
+                image_url = supabase.storage.from_("thumbnails").get_public_url(unique_name)
+            except Exception as e:
+                print(f"Upload failed: {e}")
 
         blog = Blog(
             title=title,
             content=content,
             user_id=session["user_id"],
-            thumbnail=filename,
+            thumbnail=image_url,  # Stores full URL: https://...
             category_id=category_id
         )
 
@@ -158,7 +167,6 @@ def create():
         return redirect("/")
 
     return render_template("create.html", categories=categories)
-
 
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
@@ -173,27 +181,38 @@ def edit(id):
         blog.content = request.form.get("content")
         blog.category_id = request.form.get("category")
 
+        # Handle explicit removal of image
         if request.form.get("remove_image") == "true" and blog.thumbnail:
             try:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], blog.thumbnail))
+                old_filename = blog.thumbnail.split("/")[-1]
+                supabase.storage.from_("thumbnails").remove([old_filename])
             except:
                 pass
             blog.thumbnail = None
 
         file = request.files.get("thumbnail")
         if file and file.filename != '':
+            # Delete old cloud image if it exists
             if blog.thumbnail:
                 try:
-                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], blog.thumbnail))
+                    old_filename = blog.thumbnail.split("/")[-1]
+                    supabase.storage.from_("thumbnails").remove([old_filename])
                 except:
                     pass
+
+            # Upload new cloud image
             ext = file.filename.rsplit('.', 1)[1].lower()
-            filename = f"{uuid.uuid4()}.{ext}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            blog.thumbnail = filename
+            unique_name = f"{uuid.uuid4()}.{ext}"
+            supabase.storage.from_("thumbnails").upload(
+                path=unique_name,
+                file=file.read(),
+                file_options={"content-type": f"image/{ext}"}
+            )
+            blog.thumbnail = supabase.storage.from_("thumbnails").get_public_url(unique_name)
 
         db.session.commit()
         return redirect("/my-blogs")
+
     categories = Category.query.order_by(Category.name).all()
     return render_template("edit.html", blog=blog, categories=categories)
 
@@ -203,11 +222,14 @@ def edit(id):
 def delete(id):
     blog = Blog.query.get_or_404(id)
     if blog.user_id == session["user_id"]:
+        # If there is an image URL, extract the filename and delete from cloud
         if blog.thumbnail:
             try:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], blog.thumbnail))
-            except:
-                pass
+                filename = blog.thumbnail.split("/")[-1]
+                supabase.storage.from_("thumbnails").remove([filename])
+            except Exception as e:
+                print(f"Cloud delete failed: {e}")
+
         db.session.delete(blog)
         db.session.commit()
     return redirect("/my-blogs")
@@ -268,19 +290,17 @@ def logout():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-
-        if Category.query.count() == 0:
-            db.session.add_all([
-                Category(name="Technology"),
-                Category(name="Education"),
-                Category(name="Entertainment"),
-                Category(name="News"),
-                Category(name="Opinion"),
-                Category(name="Health"),
-                Category(name="Food"),
-                Category(name="Travel"),
-                Category(name="Business"),
-            ])
-            db.session.commit()
-
+        # if Category.query.count() == 0:
+        #     db.session.add_all([
+        #         Category(name="Technology"),
+        #         Category(name="Education"),
+        #         Category(name="Entertainment"),
+        #         Category(name="News"),
+        #         Category(name="Opinion"),
+        #         Category(name="Health"),
+        #         Category(name="Food"),
+        #         Category(name="Travel"),
+        #         Category(name="Business"),
+        #     ])
+        #     db.session.commit()
     app.run(debug=True)
