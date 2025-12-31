@@ -165,6 +165,30 @@
     background: rgba(255, 255, 255, 0.05);
     color: #cbd5e0;
 }
+.category-select {
+    padding: 1rem;
+    background: rgba(15, 15, 35, 0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+}
+
+.category-select option {
+    background: #0f0f23;
+}
+.error-message {
+    color: #ff6b6b; /* soft red */
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.error-message.visible {
+    opacity: 1;
+}
+
 {% endblock %}
 
 {% block content %}
@@ -191,11 +215,21 @@
             </div>
         </div>
 
+
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" id="title" name="title" placeholder="A catchy headline..." required>
         </div>
-
+            <div class="form-group">
+            <label for="category">Category</label>
+            <select name="category" id="category" class="category-select" required>
+                <option value="" disabled selected style="color: #999;">Choose a category...</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <span id="categoryError" class="error-message"></span>
+        </div>
         <div class="form-group">
             <label for="content">The Story</label>
             <textarea id="content" name="content" placeholder="Share your magic..." required></textarea>
@@ -241,4 +275,28 @@
         charDisplay.innerText = `${this.value.length} characters`;
     };
 </script>
+<script>
+const editForm = document.getElementById('editForm');
+const categorySelect = document.getElementById('category');
+const categoryError = document.getElementById('categoryError');
+
+editForm.addEventListener('submit', function(e) {
+    if (!categorySelect.value) {
+        e.preventDefault(); // stop form submission
+        categoryError.textContent = "Please select a category!";
+        categoryError.classList.add('visible');
+    } else {
+        categoryError.textContent = "";
+        categoryError.classList.remove('visible');
+    }
+});
+
+categorySelect.addEventListener('input', () => {
+    if (categorySelect.value) {
+        categoryError.textContent = "";
+        categoryError.classList.remove('visible');
+    }
+});
+</script>
+
 {% endblock %}

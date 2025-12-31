@@ -3,6 +3,83 @@
 {% block title %}My Blogs - BlogHub{% endblock %}
 
 {% block styles %}
+/* Blog Preview Cards */
+.blog-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.blog-card {
+    background: rgba(15, 15, 35, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(180, 120, 255, 0.2);
+}
+
+.blog-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-card-content {
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.blog-card-content h3 {
+    font-size: 1.2rem;
+    color: white;
+    margin: 0;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.blog-card-content p {
+    font-size: 0.95rem;
+    color: #cbd5e0;
+    line-height: 1.4;
+    height: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.blog-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #a0aec0;
+}
+
+.category-pill {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .page-header {
     background: white;
     padding: 2rem;
@@ -135,6 +212,15 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
+.category-chip {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #4a5568;
+    font-weight: 700;
+}
+
 {% endblock %}
 
 {% block content %}
@@ -154,6 +240,7 @@
                 {{ blog.content }}
             </div>
             <div class="blog-footer">
+                <span class="category-chip">{{ blog.category.name }}</span>
                 <span class="blog-date">Created on {{ blog.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
                 <a href="/edit/{{ blog.id }}" class="btn-edit">Edit</a>
             </div>

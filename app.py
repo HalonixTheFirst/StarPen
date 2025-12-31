@@ -32,6 +32,14 @@ class User(db.Model):
     comments = db.relationship("Comment", backref="user", lazy=True, cascade="all, delete-orphan")
 
 
+class Category(db.Model):
+    __tablename__ = "categories"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    blogs = db.relationship("Blog", backref="category", lazy=True)
+
+
 class Blog(db.Model):
     __tablename__ = "blogs"
     id = db.Column(db.Integer, primary_key=True)
@@ -39,9 +47,12 @@ class Blog(db.Model):
     content = db.Column(db.Text, nullable=False)
     thumbnail = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    # Relationship to access comments from a blog object
-    comments = db.relationship("Comment", backref="blog", lazy=True, cascade="all, delete-orphan")
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
+
+    comments = db.relationship(  "Comment",backref="blog",lazy=True,cascade="all, delete-orphan")
+
 
 
 class Comment(db.Model):
@@ -61,15 +72,15 @@ def index():
     search_query = request.args.get('q')
 
     if search_query:
-        blogs = Blog.query.filter(
+        # We join with User to access the username column for the filter
+        blogs = Blog.query.join(User).filter(
             (Blog.title.ilike(f'%{search_query}%')) |
-            (Blog.content.ilike(f'%{search_query}%'))
+            (Blog.content.ilike(f'%{search_query}%')) |
+            (User.username.ilike(f'%{search_query}%')) # Search by author name
         ).order_by(Blog.created_at.desc()).all()
     else:
         blogs = Blog.query.order_by(Blog.created_at.desc()).all()
-
     return render_template("index.html", user=user, blogs=blogs, search_query=search_query)
-
 
 @app.route("/blog/<int:blog_id>/comment", methods=["POST"])
 @login_required
@@ -113,25 +124,41 @@ def blog(id):
 @app.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
+    categories = Category.query.order_by(Category.name).all()
+
     if request.method == "POST":
         title = request.form.get("title")
         content = request.form.get("content")
+        category_id = request.form.get("category")
         file = request.files.get("thumbnail")
 
-        if not title or not content:
-            return render_template("create.html", error="Title and content are required")
+        if not title or not content or not category_id:
+            return render_template(
+                "create.html",
+                error="All fields are required",
+                categories=categories
+            )
 
         filename = None
-        if file and file.filename != '':
+        if file and file.filename:
             ext = file.filename.rsplit('.', 1)[1].lower()
             filename = f"{uuid.uuid4()}.{ext}"
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        blog = Blog(title=title, content=content, user_id=session["user_id"], thumbnail=filename)
+        blog = Blog(
+            title=title,
+            content=content,
+            user_id=session["user_id"],
+            thumbnail=filename,
+            category_id=category_id
+        )
+
         db.session.add(blog)
         db.session.commit()
         return redirect("/")
-    return render_template("create.html")
+
+    return render_template("create.html", categories=categories)
+
 
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
@@ -144,6 +171,7 @@ def edit(id):
     if request.method == "POST":
         blog.title = request.form.get("title")
         blog.content = request.form.get("content")
+        blog.category_id = request.form.get("category")
 
         if request.form.get("remove_image") == "true" and blog.thumbnail:
             try:
@@ -166,7 +194,8 @@ def edit(id):
 
         db.session.commit()
         return redirect("/my-blogs")
-    return render_template("edit.html", blog=blog)
+    categories = Category.query.order_by(Category.name).all()
+    return render_template("edit.html", blog=blog, categories=categories)
 
 
 @app.route("/delete/<int:id>", methods=["POST"])
@@ -239,4 +268,19 @@ def logout():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+
+        if Category.query.count() == 0:
+            db.session.add_all([
+                Category(name="Technology"),
+                Category(name="Education"),
+                Category(name="Entertainment"),
+                Category(name="News"),
+                Category(name="Opinion"),
+                Category(name="Health"),
+                Category(name="Food"),
+                Category(name="Travel"),
+                Category(name="Business"),
+            ])
+            db.session.commit()
+
     app.run(debug=True)

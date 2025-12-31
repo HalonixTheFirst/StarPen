@@ -227,6 +227,16 @@
     background: linear-gradient(135deg, #ff5f5f, #ff3b3b);
     color: white;
 }
+.category-pill {
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    color: white;
+    float: right;  /* aligns it to the right */
+}
+
 
 {% endblock %}
 
@@ -242,6 +252,7 @@
         {% endif %}
 
         <div class="blog-header">
+            <span class="category-pill">{{ blog.category.name }}</span>
             <h1 class="blog-title">{{ blog.title }}</h1>
 
             <div class="blog-meta">

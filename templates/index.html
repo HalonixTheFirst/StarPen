@@ -103,6 +103,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+
 }
 
 .card-title {
@@ -192,6 +193,20 @@
     text-align: center;
     padding: 5rem 2rem;
 }
+.category-badge {
+    display: inline-block;
+    width: 50%;             /* half the width of the parent */
+    text-align: center;     /* center text inside the badge */
+    margin-bottom: 0.6rem;
+    padding: 6px 0;         /* adjust vertical padding for better fit */
+    font-size: 0.85rem;     /* slightly bigger text */
+    font-weight: 700;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+    color: white;
+}
+
+
 {% endblock %}
 
 {% block content %}
@@ -229,6 +244,7 @@
         </div>
 
         <div class="card-content">
+            <span class="category-badge">{{ blog.category.name }}</span>
             <h2 class="card-title">{{ blog.title }}</h2>
             <p class="card-snippet">{{ blog.content }}</p>
 
