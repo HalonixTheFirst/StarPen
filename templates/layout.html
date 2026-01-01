@@ -182,33 +182,34 @@
             </div>
         </a>
 
-        <div class="nav-links">
-            {% if session.user_id %}
-                {% if request.path != '/' %}
-                    <a href="/">All Blogs</a>
-                {% endif %}
+      <div class="nav-links">
+    {% if current_user.is_authenticated %}
+        {# Logged In Links #}
+        {% if request.path != '/' %}
+            <a href="/">All Blogs</a>
+        {% endif %}
 
-                {% if request.path != '/create' %}
-                    <a href="/create">Write Blog</a>
-                {% endif %}
+        {% if request.path != '/create' %}
+            <a href="/create">Write Blog</a>
+        {% endif %}
 
-                {% if request.path != '/my-blogs' %}
-                    <a href="/my-blogs">My Blogs</a>
-                {% endif %}
+        {% if request.path != '/my-blogs' %}
+            <a href="/my-blogs">My Blogs</a>
+        {% endif %}
 
-                <a href="/logout" class="btn-cancel-aesthetic">Logout</a>
-            {% else %}
-                {% if request.path != '/login' %}
-                    <a href="/login">Login</a>
-                {% endif %}
+        <a href="/logout" class="btn-cancel-aesthetic">Logout ({{ current_user.username }})</a>
+    {% else %}
+        {# Logged Out Links #}
+        {% if request.path != '/login' %}
+            <a href="/login">Login</a>
+        {% endif %}
 
-                {% if request.path != '/register' %}
-                    <a href="/register">Register</a>
-                {% endif %}
-            {% endif %}
-        </div>
+        {% if request.path != '/register' %}
+            <a href="/register">Register</a>
+        {% endif %}
+    {% endif %}
+</div>
     </nav>
-
     <div class="container">
         {% block content %}{% endblock %}
     </div>

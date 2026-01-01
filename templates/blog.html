@@ -271,60 +271,61 @@
         </div>
     </article>
 
-    <section class="comments-section">
-        <h3>Comments ({{ blog.comments|length }})</h3>
+<section class="comments-section">
+    <h3>Comments ({{ blog.comments|length }})</h3>
 
-        {% if session.get("user_id") %}
-            <form action="/blog/{{ blog.id }}/comment"
-                  method="POST"
-                  class="comment-form"
-                  onsubmit="event.preventDefault(); validateComment(this);">
+    {# UPDATED: Check if user is logged in using current_user #}
+    {% if current_user.is_authenticated %}
+        <form action="/blog/{{ blog.id }}/comment"
+              method="POST"
+              class="comment-form"
+              onsubmit="event.preventDefault(); validateComment(this);">
 
-                <textarea
-                    id="commentInput"
-                    name="comment_content"
-                    rows="3"
-                    placeholder="Add a comment..."></textarea>
+            <textarea
+                id="commentInput"
+                name="comment_content"
+                rows="3"
+                placeholder="Add a comment..."></textarea>
 
-                <button type="submit"
-                        style="padding: 0.7rem 1.5rem;
-                               border-radius: 30px;
-                               border:none;
-                               color:white;
-                               background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
-                               cursor:pointer;">
-                    Post Comment
-                </button>
-            </form>
+            <button type="submit"
+                    style="padding: 0.7rem 1.5rem;
+                           border-radius: 30px;
+                           border:none;
+                           color:white;
+                           background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));
+                           cursor:pointer;">
+                Post Comment
+            </button>
+        </form>
 
-        {% else %}
-        <div class="comment-form" style="text-align: center;">
-            <p style="color: #a0aec0;">Please <a href="/login" style="color: var(--magic-p1);">login</a> to join the conversation.</p>
-        </div>
-        {% endif %}
+    {% else %}
+    <div class="comment-form" style="text-align: center;">
+        <p style="color: #a0aec0;">Please <a href="/login" style="color: var(--magic-p1);">login</a> to join the conversation.</p>
+    </div>
+    {% endif %}
 
-        <div class="comments-list">
-            {% for comment in blog.comments|sort(attribute='created_at', reverse=True) %}
-            <div class="comment-card">
-                <div class="comment-header">
-                    <div>
-                        <span class="comment-user">@{{ comment.user.username }}</span>
-                        <span class="comment-date">• {{ comment.created_at.strftime("%b %d") }}</span>
-                    </div>
-
-                    {% if session.get("user_id") == comment.user_id %}
-                       <form action="/comment/delete/{{ comment.id }}" method="POST"
-                          onsubmit="event.preventDefault(); openDeleteAlert(this);">
-                            <button type="submit" class="delete-comment-btn">Delete</button>
-                        </form>
-
-                    {% endif %}
+    <div class="comments-list">
+        {% for comment in blog.comments|sort(attribute='created_at', reverse=True) %}
+        <div class="comment-card">
+            <div class="comment-header">
+                <div>
+                    <span class="comment-user">@{{ comment.user.username }}</span>
+                    <span class="comment-date">• {{ comment.created_at.strftime("%b %d") }}</span>
                 </div>
-                <p style="color: #cbd5e0; margin: 0;">{{ comment.content }}</p>
+
+                {# UPDATED: Compare comment owner ID with current_user.id #}
+                {% if current_user.is_authenticated and current_user.id == comment.user_id %}
+                   <form action="/comment/delete/{{ comment.id }}" method="POST"
+                      onsubmit="event.preventDefault(); openDeleteAlert(this);">
+                        <button type="submit" class="delete-comment-btn">Delete</button>
+                    </form>
+                {% endif %}
             </div>
-            {% endfor %}
+            <p style="color: #cbd5e0; margin: 0;">{{ comment.content }}</p>
         </div>
-    </section>
+        {% endfor %}
+    </div>
+</section>
     </article>
 </div>
 <div id="deleteAlert" class="alert-overlay" style="display:none;">

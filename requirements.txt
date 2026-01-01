@@ -1,5 +1,6 @@
 Flask
 Flask-SQLAlchemy
+Flask-Login
 psycopg2-binary
 python-dotenv
 Werkzeug
