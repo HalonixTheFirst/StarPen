@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}StarPen{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <link rel="icon" href="https://tqyrlqtglwmnmulzyumo.supabase.co/storage/v1/object/public/thumbnails/Screenshot%202025-12-31%20223623.png">
@@ -56,44 +59,34 @@
         .tile { position: relative; cursor: pointer; }
         .tile:before { background-color: var(--bg-dark); content: ""; inset: 0px; position: absolute; }
 
-        nav {
-            height: 140px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2.5rem;
+        /* Bootstrap Integrated Nav */
+        nav.navbar {
+            min-height: 120px;
             position: relative;
             z-index: 10;
-            pointer-events: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
         }
 
-        /* FIX: Re-enabling interaction for all form elements and links */
-        .brand-link, nav a, .logout-btn,
-        .container a, .container button, .container input,
-        .container textarea, .file-upload-wrapper {
+        /* Enable interaction for links despite background tiles */
+        .brand-link, .nav-link, .btn-cancel-aesthetic, .tile-interaction-fix {
             pointer-events: auto !important;
         }
 
-        .brand-link { text-decoration: none; }
+        .brand-link { text-decoration: none; display: inline-block; }
 
         .brand.magic {
             display: inline-block;
             position: relative;
-            font-size: 3.5rem;
+            font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive Logo Size */
             font-weight: 900;
             user-select: none;
             filter: drop-shadow(0px 0px 15px rgba(180, 120, 255, 0.4));
             transition: transform 0.3s ease;
         }
 
-        .brand-link:hover .brand.magic {
-            transform: scale(1.02);
-            filter: drop-shadow(0px 0px 20px rgba(180, 120, 255, 0.6));
-        }
-
         .magic-star {
-            --size: clamp(25px, 2vw, 40px);
+            --size: clamp(20px, 2vw, 40px);
             --star-left: 50%;
             --star-top: 50%;
             animation: scale 700ms ease forwards;
@@ -118,50 +111,45 @@
             white-space: nowrap;
         }
 
-        nav .nav-links { display: flex; gap: 2rem; align-items: center; }
-        nav a { text-decoration: none; color: #cbd5e0; font-weight: 600; font-size: 1.1rem; transition: color 0.2s; }
-        nav a:hover { color: #fff; }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white !important;
-            padding: 0.7rem 1.8rem !important;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .container {
-            position: relative;
-            z-index: 10;
-            pointer-events: none;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
         .btn-cancel-aesthetic {
-            background: rgba(255, 255, 255, 0.05); /* Very light transparent white */
-            color: #a0aec0; /* Soft grey text */
+            background: rgba(255, 255, 255, 0.05);
+            color: #a0aec0;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.8rem 2rem;
+            padding: 0.6rem 1.5rem;
             border-radius: 30px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             backdrop-filter: blur(5px);
             display: inline-block;
         }
 
         .btn-cancel-aesthetic:hover {
-            background: rgba(255, 255, 255, 0.1); /* Brightens slightly */
-            color: #ffffff; /* Text turns white */
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
             border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
         }
 
-        .btn-cancel-aesthetic:active {
-            transform: translateY(0);
+        .container-content {
+            position: relative;
+            z-index: 10;
+            pointer-events: none; /* Allows clicks to pass to tiles unless overridden */
+            margin-top: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .content-wrapper {
+            pointer-events: auto; /* Re-enable clicks for your forms/blogs */
+        }
+
+        /* Mobile Hamburger Icon Color */
+        .navbar-toggler {
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+        .navbar-toggler-icon {
+            filter: invert(1);
         }
 
         {% block styles %}{% endblock %}
@@ -172,47 +160,60 @@
 
     <div id="tiles"></div>
 
-    <nav>
-        <a href="/" class="brand-link">
-            <div class="brand magic">
-                <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
-                <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
-                <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
-                <span class="magic-text">StarPen</span>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a href="/" class="brand-link">
+                <div class="brand magic">
+                    <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
+                    <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
+                    <span class="magic-star"><svg viewBox="0 0 512 512"><path d="M512 255.1c0 11.34-7.406 20.86-18.44 23.64l-171.3 42.78l-42.78 171.1C276.7 504.6 267.2 512 255.9 512s-20.84-7.406-23.62-18.44l-42.66-171.2L18.47 279.6C7.406 276.8 0 267.3 0 255.1c0-11.34 7.406-20.83 18.44-23.61l171.2-42.78l42.78-171.1C235.2 7.406 244.7 0 256 0s20.84 7.406 23.62 18.44l42.78 171.2l171.2 42.78C504.6 235.2 512 244.6 512 255.1z" /></svg></span>
+                    <span class="magic-text">StarPen</span>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#starPenNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="starPenNav">
+                <div class="navbar-nav align-items-center gap-3 mt-3 mt-lg-0">
+                    {% if current_user.is_authenticated %}
+                        {% if request.path != '/' %}
+                            <a class="nav-link text-light fw-semibold" href="/">All Blogs</a>
+                        {% endif %}
+
+                        {% if request.path != '/create' %}
+                            <a class="nav-link text-light fw-semibold" href="/create">Write Blog</a>
+                        {% endif %}
+
+                        {% if request.path != '/my-blogs' %}
+                            <a class="nav-link text-light fw-semibold" href="/my-blogs">My Blogs</a>
+                        {% endif %}
+
+                        <a href="/logout" class="btn-cancel-aesthetic ms-lg-2">Logout ({{ current_user.username }})</a>
+                    {% else %}
+                        {% if request.path != '/login' %}
+                            <a class="nav-link text-light fw-semibold" href="/login">Login</a>
+                        {% endif %}
+
+                        {% if request.path != '/register' %}
+                            <a class="nav-link text-light fw-semibold" href="/register">Register</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
-        </a>
-
-      <div class="nav-links">
-    {% if current_user.is_authenticated %}
-        {# Logged In Links #}
-        {% if request.path != '/' %}
-            <a href="/">All Blogs</a>
-        {% endif %}
-
-        {% if request.path != '/create' %}
-            <a href="/create">Write Blog</a>
-        {% endif %}
-
-        {% if request.path != '/my-blogs' %}
-            <a href="/my-blogs">My Blogs</a>
-        {% endif %}
-
-        <a href="/logout" class="btn-cancel-aesthetic">Logout ({{ current_user.username }})</a>
-    {% else %}
-        {# Logged Out Links #}
-        {% if request.path != '/login' %}
-            <a href="/login">Login</a>
-        {% endif %}
-
-        {% if request.path != '/register' %}
-            <a href="/register">Register</a>
-        {% endif %}
-    {% endif %}
-</div>
+        </div>
     </nav>
-    <div class="container">
-        {% block content %}{% endblock %}
+
+    <div class="container container-content">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10 content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const wrapper = document.getElementById("tiles");
