@@ -20,6 +20,7 @@ app.config[ "SQLALCHEMY_ENGINE_OPTIONS" ] = {
     "pool_size" : 10,
     "max_overflow" : 20,
 }
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
