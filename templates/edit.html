@@ -179,7 +179,23 @@ select option {
     font-size: 0.95rem;
     backdrop-filter: blur(5px);
 }
+.modal-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
 
+.btn-confirm-delete {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
 .btn-delete-aesthetic:hover {
     background: #ff4d4d; /* Solid red on hover */
     color: white;
@@ -314,17 +330,14 @@ select option {
         </div>
     </form>
 
-    <div class="form-actions-row">
-        <form method="POST" action="/delete/{{ blog.id }}" onsubmit="return confirm('Delete this story permanently?');">
-            <button type="button" class="btn-delete-aesthetic" onclick="openDeleteModal('/delete/{{ blog.id }}')">
-            Delete Post
-        </button>
-        </form>
+   <div class="form-actions-row">
+    <button type="button" class="btn-delete-aesthetic" onclick="openDeleteModal('{{ blog.id }}')">
+        Delete Post
+    </button>
 
-        <div style="display: flex; gap: 1rem;">
-            <a href="/my-blogs" class="btn-cancel-aesthetic">Cancel</a>
-            <button type="submit" form="editForm" class="btn-update-aesthetic">Update Story</button>
-        </div>
+    <div style="display: flex; gap: 1rem;">
+        <a href="/my-blogs" class="btn-cancel-aesthetic">Cancel</a>
+        <button type="submit" form="editForm" class="btn-update-aesthetic">Update Story</button>
     </div>
 </div>
 
@@ -354,10 +367,13 @@ select option {
         removeBtn.style.display = 'none';
         removeFlag.value = "true"; // Signal Python to delete the file
     };
-    function openDeleteModal(deleteUrl) {
+    function openDeleteModal(blogId) {
     const modal = document.getElementById('deleteModal');
-    const confirmLink = document.getElementById('confirmDeleteLink');
-    confirmLink.href = deleteUrl;
+    const form = document.getElementById('deleteForm');
+
+    // Set the form action to your route: /delete/<id>
+    form.action = "/delete/" + blogId;
+
     modal.classList.add('active');
 }
 
@@ -378,9 +394,13 @@ window.onclick = function(event) {
         <div class="modal-icon">🌠</div>
         <h2>Delete this Story?</h2>
         <p>Once you erase this star, it vanishes from the galaxy forever.</p>
+
         <div class="modal-actions">
             <button type="button" onclick="closeDeleteModal()" class="btn-cancel">Keep it</button>
-            <a id="confirmDeleteLink" href="#" class="btn-confirm-delete">Erase Permanently</a>
+
+            <form id="deleteForm" method="POST" action="">
+                <button type="submit" class="btn-confirm-delete">Erase Permanently</button>
+            </form>
         </div>
     </div>
 </div>
