@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Stay a While</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .fullscreen-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .fullscreen-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Container for all UI elements */
+        .content-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes items to top and bottom */
+            align-items: center;
+            padding: 4rem 2rem; /* Spacing from screen edges */
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gradient Text at the Top */
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 3.5rem);
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.2;
+
+            /* Gradient Logic */
+            background: linear-gradient(to right, #fff, #b478ff, #8c96ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+
+            /* Security/UI Guards */
+            user-select: none;      /* Prevents highlighting/selection */
+            pointer-events: none;   /* Prevents clicking/hover effects */
+            cursor: default;        /* Ensures the cursor doesn't change to a text beam */
+
+        }
+
+        /* Link at the Bottom */
+        .home-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            padding: 12px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .home-link:hover {
+            background: white;
+            color: black;
+            border-color: white;
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fullscreen-bg">
+        <img src="https://tqyrlqtglwmnmulzyumo.supabase.co/storage/v1/object/public/thumbnails/cat-floating-on-the-water-moewalls-com.gif"
+             alt="Floating Cat"
+             crossorigin="anonymous">
+    </div>
+
+    <div class="content-wrapper">
+        <h1>Welcome to the 404 page,<br>Stay as long as you want.</h1>
+
+        <a href="/" class="home-link">BACK TO STARPEN</a>
+    </div>
+
+</body>
+</html>
