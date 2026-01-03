@@ -3,8 +3,6 @@
 {% block title %}Explore Stories - StarPen{% endblock %}
 
 {% block styles %}
-/* Search Section */
-/* Container & Bar Glow */
 .search-container {
     max-width: 600px;
     margin: 0 auto 2rem;
@@ -22,7 +20,6 @@
     backdrop-filter: blur(10px);
 }
 
-/* Expansion and Border Glow on Focus */
 .search-form:focus-within {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--magic-p1);
@@ -40,7 +37,6 @@
     outline: none;
 }
 
-/* The Magnifying Glass Animation */
 .search-submit-btn {
     background: transparent;
     border: none;
@@ -57,21 +53,18 @@
     transition: all 0.3s ease;
 }
 
-/* When the user is typing or clicking in the box */
 .search-form:focus-within .search-submit-btn span {
     transform: scale(1.2) rotate(-10deg);
     filter: drop-shadow(0 0 8px var(--magic-p1));
     animation: searchPulse 2s infinite ease-in-out;
 }
 
-/* Float & Glow Animation */
 @keyframes searchPulse {
     0% { transform: scale(1.2) rotate(-10deg); filter: drop-shadow(0 0 5px var(--magic-p1)); }
     50% { transform: scale(1.3) rotate(5deg); filter: drop-shadow(0 0 15px var(--magic-p1)); }
     100% { transform: scale(1.2) rotate(-10deg); filter: drop-shadow(0 0 5px var(--magic-p1)); }
 }
 
-/* Blog Grid Layout */
 .blog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -174,7 +167,6 @@
     color: #e2e8f0;
 }
 
-/* Stats and Meta */
 .stats-group {
     display: flex;
     align-items: center;
@@ -210,11 +202,11 @@
 }
 .category-badge {
     display: inline-block;
-    width: 50%;             /* half the width of the parent */
-    text-align: center;     /* center text inside the badge */
+    width: 50%;
+    text-align: center;
     margin-bottom: 0.6rem;
-    padding: 6px 0;         /* adjust vertical padding for better fit */
-    font-size: 0.85rem;     /* slightly bigger text */
+    padding: 6px 0;
+    font-size: 0.85rem;
     font-weight: 700;
     border-radius: 999px;
     background: linear-gradient(135deg, var(--magic-p1), var(--magic-v1));

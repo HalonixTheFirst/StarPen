@@ -5,15 +5,13 @@
 {% block styles %}
 .split-screen {
     display: flex;
-    /* Aligns both the form and the preview to the top */
     align-items: flex-start;
     justify-content: center;
     gap: 4rem;
     min-height: 90vh;
-    padding-top: 1rem; /* Adjusts how far down from the navbar the whole section starts */
+    padding-top: 1rem;
 }
 
-/* Auth Card Styling */
 .auth-card {
     background: rgba(255, 255, 255, 0.05);
     width: 100%;
@@ -72,7 +70,6 @@
     box-shadow: 0 10px 20px rgba(180, 120, 255, 0.3);
 }
 
-/* Preview Side Styling - Top Aligned */
 .app-preview {
     width: 420px;
     display: none;
@@ -88,13 +85,11 @@
     letter-spacing: 3px;
     text-align: center;
     font-size: 0.9rem;
-    /* This ensures the header is level with the form's title */
     padding-top: 0.5rem;
 }
 
 .preview-stack {
     position: relative;
-    /* Ensure the first card starts high up */
     margin-top: 0;
 }
 
@@ -103,7 +98,6 @@
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-    /* Spreads the cards out to occupy vertical space */
     margin-bottom: -230px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(255, 255, 255, 0.1);

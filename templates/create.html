@@ -70,7 +70,6 @@
     resize: vertical;
 }
 
-/* Fixed Centered Upload Wrapper */
 .file-upload-wrapper {
     position: relative;
     width: 100%;
@@ -119,7 +118,6 @@
     z-index: 3;
 }
 
-/* Remove Image Button */
 #removeImgBtn {
     display: none;
     position: absolute;
@@ -188,7 +186,6 @@
 .error-message.visible {
     opacity: 1;
 }
-/* Container must be relative for the bear to anchor to it */
 .create-container {
     position: relative;
     margin-top: 5rem; /* Increased margin to give the bear room to sit */
@@ -213,7 +210,6 @@
     transform: scale(1.1) translateY(-5px);
 }
 
-/* Optional Speech Bubble */
 .buddy-bubble {
     position: absolute;
     top: -30px;
@@ -235,19 +231,17 @@
     opacity: 1;
     transform: translateY(0);
 }
-/* 1. This wrapper makes the bear stick to the textarea specifically */
-/* 1. Wrapper needs more space at the top so bear doesn't hit the 'Story' label */
+
 .textarea-wrapper {
     position: relative;
     width: 100%;
     margin-top: 45px;
 }
 
-/* 2. Positioned to the Top-Right */
 .writer-buddy {
     position: absolute;
-    top: -50px;   /* Pulls him up onto the top border */
-    right: 15px;  /* Changed from left to right */
+    top: -50px;
+    right: 15px;
     z-index: 5;
     display: flex;
     flex-direction: column;
@@ -259,12 +253,10 @@
     width: 70px;
     height: auto;
     filter: drop-shadow(0 0 10px rgba(180, 120, 255, 0.4));
-    /* Flips the bear to face left (towards the text) */
     transform: scaleX(-1);
     animation: buddy-float 3s ease-in-out infinite;
 }
 
-/* 3. The Speech Bubble */
 .buddy-bubble {
     background: white;
     color: #1a1a2e;
@@ -278,7 +270,6 @@
     position: relative;
 }
 
-/* Adds a little tail to the bubble pointing to the bear */
 .buddy-bubble::after {
     content: '';
     position: absolute;
@@ -290,7 +281,6 @@
     border-top: 5px solid white;
 }
 
-/* 4. Textarea tweaks */
 #content {
     width: 100%;
     min-height: 250px;
@@ -301,7 +291,6 @@
     padding: 1rem;
 }
 
-/* Floating animation including the flip */
 @keyframes buddy-float {
     0%, 100% { transform: translateY(0) scaleX(-1); }
     50% { transform: translateY(-6px) scaleX(-1); }
@@ -377,7 +366,6 @@
     const textarea = document.getElementById('content');
     const charDisplay = document.getElementById('charCount');
 
-    // Handle File Preview
     fileInput.onchange = evt => {
         const [file] = fileInput.files;
         if (file) {
@@ -388,7 +376,6 @@
         }
     };
 
-    // Handle Remove Image
     removeBtn.onclick = () => {
         fileInput.value = ""; // Clear input
         imgPreview.style.display = 'none';
@@ -396,7 +383,6 @@
         removeBtn.style.display = 'none';
     };
 
-    // Handle Character Count
     textarea.oninput = function() {
         charDisplay.innerText = `${this.value.length} characters`;
     };
