@@ -31,7 +31,6 @@
             display: block;
         }
 
-        /* Container for all UI elements */
         .content-wrapper {
             position: absolute;
             top: 0;
@@ -41,33 +40,28 @@
             z-index: 2;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Pushes items to top and bottom */
+            justify-content: space-between;
             align-items: center;
-            padding: 4rem 2rem; /* Spacing from screen edges */
+            padding: 4rem 2rem;
             background: rgba(0, 0, 0, 0.1);
         }
-
-        /* Gradient Text at the Top */
         h1 {
             font-size: clamp(1.8rem, 6vw, 3.5rem);
             font-weight: 900;
             text-align: center;
             line-height: 1.2;
 
-            /* Gradient Logic */
             background: linear-gradient(to right, #fff, #b478ff, #8c96ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
 
-            /* Security/UI Guards */
-            user-select: none;      /* Prevents highlighting/selection */
-            pointer-events: none;   /* Prevents clicking/hover effects */
-            cursor: default;        /* Ensures the cursor doesn't change to a text beam */
+            user-select: none;
+            pointer-events: none;
+            cursor: default;
 
         }
 
-        /* Link at the Bottom */
         .home-link {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;

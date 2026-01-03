@@ -48,7 +48,6 @@ class Category(db.Model) :
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50), unique = True, nullable = False)
-
     blogs = db.relationship("Blog", backref = "category", lazy = True)
 
 
@@ -59,10 +58,8 @@ class Blog(db.Model) :
     content = db.Column(db.Text, nullable = False)
     thumbnail = db.Column(db.String(255), nullable = True)
     created_at = db.Column(db.DateTime, default = datetime.utcnow)
-
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable = False)
-
     comments = db.relationship("Comment", backref = "blog", lazy = True, cascade = "all, delete-orphan")
 
 
@@ -299,8 +296,6 @@ def register():
 
         login_user(new_user)
         return redirect(url_for('index'))
-
-        # return redirect(url_for('login'))
 
     return render_template("register.html", preview_blogs=get_previews())
 
